@@ -78,11 +78,21 @@ class Application(tk.Frame):
 
     def thread4download(self):
         url = self.input.get()
+        self.oneiteminfo=tk.Frame(self.download_status_frame)
+        self.oneiteminfo.pack(side=tk.BOTTOM)
+        self.urllabelinfo = tk.Label(self.oneiteminfo,text=url)
+        self.urllabelinfo.pack(side=tk.LEFT)
+        self.downloadpercentage = tk.Label(self.oneiteminfo)
+        self.downloadpercentage.pack(side=tk.RIGHT)
+
         if self.choice1.get() == "single":
-            single_downloader.Single_vid_download(url,self.folder_name).download()
+            single_downloader.Single_vid_download(url,self.folder_name,on_progress_callback=self.show_status).download()
         else:
             series_downloader.Series_vid_download(url,self.folder_name).download()        
 
+
+    def show_status(self, stream, chunk, file_handler, bytes_remaining): 
+        self.downloadpercentage['text']="{:.1f}%".format((100*(stream._filesize-bytes_remaining))/stream._filesize)
 
 
     def download(self):
@@ -94,22 +104,8 @@ class Application(tk.Frame):
 
 
 
-    # def show_status(self): 
     
-    def change_titlelabel(self,event):
 
-        url = self.inputurl.get()
-        print(url)
-        try:
-            if self.choice.get() == "single":
-                title = single_downloader.Single_vid_download(url).title
-            else:
-                title = series_downloader.Series_vid_download(url).title
-            
-        except:
-            title = "Not Valid"
-        finally:
-            self.title_label["text"]="title: "+title
 
     def browse_path(self):
         selected_folder = filedialog.askdirectory()
