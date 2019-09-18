@@ -97,20 +97,20 @@ class Application(tk.Frame):
         else:
             series_downloader.Series_vid_download(url,self.folder_name).download()
     
-    # def change_titlelabel(self,event):
+    def change_titlelabel(self,event):
 
-    #     url = self.inputurl.get()
-    #     print(url)
-    #     try:
-    #         if self.choice.get() == "single":
-    #             title = single_downloader.Single_vid_download(url).title
-    #         else:
-    #             title = series_downloader.Series_vid_download(url).title
+        url = self.inputurl.get()
+        print(url)
+        try:
+            if self.choice.get() == "single":
+                title = single_downloader.Single_vid_download(url).title
+            else:
+                title = series_downloader.Series_vid_download(url).title
             
-    #     except:
-    #         title = "Not Valid"
-    #     finally:
-    #         self.title_label["text"]="title: "+title
+        except:
+            title = "Not Valid"
+        finally:
+            self.title_label["text"]="title: "+title
 
     def browse_path(self):
         selected_folder = filedialog.askdirectory()
