@@ -3,6 +3,7 @@ import single_downloader
 import tkinter as tk
 from tkinter import filedialog
 import json
+import threading
 
 class Application(tk.Frame):
     def __init__(self, master=None):
@@ -12,13 +13,6 @@ class Application(tk.Frame):
         self.pack()
         self.create_widgets()
         
-    def setting(self):
-        s=open('setting.json','r')
-        self.settings=json.loads(s.read())
-        s.close()
-        self.choice1 = tk.StringVar()
-        self.choice1.set(self.settings['choice'])
-        self.folder_name=self.settings['folder_name']
 
     def create_widgets(self):
         self.border_frame=tk.Frame(self.master)
@@ -27,6 +21,7 @@ class Application(tk.Frame):
         self.radio_selection_frame()
         self.downloadfolder_frame()
         self.button_frame()
+        self.download_status_frame()
         
         
         
@@ -75,27 +70,31 @@ class Application(tk.Frame):
         self.download_button = tk.Button(self.button_frame,text="Download",command=self.download)
         self.download_button.pack(side=tk.LEFT)
 
-    def input_entry(self):
-        pass
+    def download_status_frame(self):
+        #download INFO
+        self.download_status_frame = tk.Frame(self.border_frame)
+        self.download_status_frame.pack(pady=10)
 
 
-
+    def thread4download(self):
+        url = self.input.get()
+        if self.choice1.get() == "single":
+            single_downloader.Single_vid_download(url,self.folder_name).download()
+        else:
+            series_downloader.Series_vid_download(url,self.folder_name).download()        
 
 
 
     def download(self):
-        url = self.input.get()
-        self.settings={
-            'choice': self.choice1.get(),
-            'folder_name': self.folder_name
-        }
-        s=open('setting.json','w')
-        s.write(json.dumps(self.settings))
-        s.close()
-        if self.choice1.get() == "single":
-            single_downloader.Single_vid_download(url,self.folder_name).download()
-        else:
-            series_downloader.Series_vid_download(url,self.folder_name).download()
+        
+        self.savesetting()
+        t = threading.Thread(target=self.thread4download)
+        t.start()
+    #     self.show_status()
+
+
+
+    # def show_status(self): 
     
     def change_titlelabel(self,event):
 
@@ -120,6 +119,24 @@ class Application(tk.Frame):
                 self.label_download_folder['text']=self.folder_name[:15]+" ... "+self.folder_name[-15:]
             else:
                 self.label_download_folder['text']=self.folder_name
+
+    def setting(self):
+        s=open('setting.json','r')
+        self.settings=json.loads(s.read())
+        s.close()
+        self.choice1 = tk.StringVar()
+        self.choice1.set(self.settings['choice'])
+        self.folder_name=self.settings['folder_name']
+
+    def savesetting(self):
+        self.settings={
+            'choice': self.choice1.get(),
+            'folder_name': self.folder_name
+        }
+        s=open('setting.json','w')
+        s.write(json.dumps(self.settings))
+        s.close()
+
 
 
 root = tk.Tk()
