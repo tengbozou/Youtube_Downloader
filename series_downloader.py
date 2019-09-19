@@ -2,17 +2,18 @@ from pytube import Playlist
 import os
 
 class Series_vid_download:
-	def __init__(self, baseurl,downloadfolder="../Downloads/"):
+	def __init__(self, baseurl,downloadfolder="../Downloads/",on_progress_callback=None):
 		self.baseurl=baseurl
-		self.title = format_filename(Playlist(self.baseurl).title())
+		self.playlist = Playlist(self.baseurl,on_progress_callback=on_progress_callback)
+		self.title = format_filename(self.playlist.title())
 		self.downloadfolder=downloadfolder
 
 	def download(self):
-		folder = self.downloadfolder+self.series_name
+		folder = self.downloadfolder+self.title
 		if not os.path.exists(folder):
 			os.mkdir(folder)
-		playlist = Playlist(self.baseurl)
-		playlist.download_all(folder)
+		
+		self.playlist.download_all(folder)
 
 
 def format_filename(s):

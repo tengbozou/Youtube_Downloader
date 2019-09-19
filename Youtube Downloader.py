@@ -88,12 +88,14 @@ class Application(tk.Frame):
         if self.choice1.get() == "single":
             single_downloader.Single_vid_download(url,self.folder_name,on_progress_callback=self.show_status).download()
         else:
-            series_downloader.Series_vid_download(url,self.folder_name).download()        
+            series_downloader.Series_vid_download(url,self.folder_name,on_progress_callback=self.show_status_list).download()        
 
 
     def show_status(self, stream, chunk, file_handler, bytes_remaining): 
         self.downloadpercentage['text']="{:.1f}%".format((100*(stream._filesize-bytes_remaining))/stream._filesize)
 
+    def show_status_list(self,progress_message):
+        self.downloadpercentage['text']=progress_message
 
     def download(self):
         
