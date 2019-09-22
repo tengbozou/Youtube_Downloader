@@ -1,3 +1,10 @@
+# due to some adjustment to module 'pytude', this app needs to load the virtual environment which is
+# included in folder env. The following code is a safe guard in case users did not load virtual environment
+import sys
+import os
+sys.path.insert(1,os.path.abspath("env/Lib/site-packages"))
+print(sys.path)
+#import other modules
 import series_downloader
 import single_downloader
 import tkinter as tk
@@ -5,6 +12,7 @@ from tkinter import filedialog
 import json
 import threading
 
+# GUI design
 class Application(tk.Frame):
     def __init__(self, master=None):
         super().__init__(master)
@@ -13,10 +21,12 @@ class Application(tk.Frame):
         self.pack()
         self.create_widgets()
         
-
+        # the widget containing several frames
     def create_widgets(self):
+        #this frame is to implement a margin of the gui
         self.border_frame=tk.Frame(self.master)
         self.border_frame.pack(padx=40,pady=40)
+        #other frames inside border_frame
         self.input_entry_frame()
         self.radio_selection_frame()
         self.downloadfolder_frame()
@@ -77,32 +87,38 @@ class Application(tk.Frame):
 
 
     def thread4download(self):
+        #whenever press the download button, a thread is created
         url = self.input.get()
+        self.create_task_info_frame()
+        if self.choice1.get() == "single":
+            single_downloader.Single_vid_download(url,self.folder_name,on_progress_callback=self.show_status_single).download()
+        else:
+            series_downloader.Series_vid_download(url,self.folder_name,on_progress_callback=self.show_status_list).download()        
+
+    def create_task_info_frame(self):
+        #when a thread start, create a frame to show its info
         self.oneiteminfo=tk.Frame(self.download_status_frame)
         self.oneiteminfo.pack(side=tk.BOTTOM)
         self.urllabelinfo = tk.Label(self.oneiteminfo,text=url)
         self.urllabelinfo.pack(side=tk.LEFT)
         self.downloadpercentage = tk.Label(self.oneiteminfo)
-        self.downloadpercentage.pack(side=tk.RIGHT)
+        self.downloadpercentage.pack(side=tk.RIGHT)        
 
-        if self.choice1.get() == "single":
-            single_downloader.Single_vid_download(url,self.folder_name,on_progress_callback=self.show_status).download()
-        else:
-            series_downloader.Series_vid_download(url,self.folder_name,on_progress_callback=self.show_status_list).download()        
-
-
-    def show_status(self, stream, chunk, file_handler, bytes_remaining): 
+#when a downloading task/thread is created, change the info of downloading status\
+#by the following two functions, one for single, one for list
+    def show_status_single(self, stream, chunk, file_handler, bytes_remaining): 
+        
         self.downloadpercentage['text']="{:.1f}%".format((100*(stream._filesize-bytes_remaining))/stream._filesize)
 
     def show_status_list(self,progress_message):
         self.downloadpercentage['text']=progress_message
 
     def download(self):
-        
+        # button download's callback function
         self.savesetting()
         t = threading.Thread(target=self.thread4download)
         t.start()
-    #     self.show_status()
+
 
 
 
@@ -110,6 +126,7 @@ class Application(tk.Frame):
 
 
     def browse_path(self):
+        # callback function of button path, choose the destination download folder
         selected_folder = filedialog.askdirectory()
         if selected_folder!="":
             self.folder_name=selected_folder
@@ -119,6 +136,7 @@ class Application(tk.Frame):
                 self.label_download_folder['text']=self.folder_name
 
     def setting(self):
+        #function to get setting from setting.json
         s=open('setting.json','r')
         self.settings=json.loads(s.read())
         s.close()
@@ -127,6 +145,7 @@ class Application(tk.Frame):
         self.folder_name=self.settings['folder_name']
 
     def savesetting(self):
+        #function to store setting to setting.json
         self.settings={
             'choice': self.choice1.get(),
             'folder_name': self.folder_name
