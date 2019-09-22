@@ -1,9 +1,6 @@
-# due to some adjustment to module 'pytude', this app needs to load the virtual environment which is
-# included in folder env. The following code is a safe guard in case users did not load virtual environment
-import sys
-import os
-sys.path.insert(1,os.path.abspath("env/Lib/site-packages"))
-print(sys.path)
+#this app is based on module "pytube"
+#however, pytube has been done some ajustment for this app.
+import pytube
 #import other modules
 import series_downloader
 import single_downloader
@@ -59,10 +56,13 @@ class Application(tk.Frame):
         #radio selection_frame
         self.selection_frame = tk.Frame(self.border_frame)
         self.selection_frame.pack()
-        self.radio1 = tk.Radiobutton(self.selection_frame,text="Single Video", variable=self.choice1, value="single")
-        self.radio2 = tk.Radiobutton(self.selection_frame,text="List of Videos", variable=self.choice1, value="list")
+        self.radio1 = tk.Radiobutton(self.selection_frame,text="Single", variable=self.choice1, value="single")
+        self.radio2 = tk.Radiobutton(self.selection_frame,text="List", variable=self.choice1, value="list")
         self.radio1.pack(side=tk.LEFT)
         self.radio2.pack(side=tk.LEFT)
+        
+        self.audioonly = tk.Checkbutton(self.selection_frame,text="Audio Only",variable=self.isaudio)
+        self.audioonly.pack(side=tk.RIGHT,padx=30)
 
     def downloadfolder_frame(self):
         #download_path
@@ -88,18 +88,18 @@ class Application(tk.Frame):
 
     def thread4download(self):
         #whenever press the download button, a thread is created
-        url = self.input.get()
+        self.url = self.input.get()
         self.create_task_info_frame()
         if self.choice1.get() == "single":
-            single_downloader.Single_vid_download(url,self.folder_name,on_progress_callback=self.show_status_single).download()
+            single_downloader.Single_vid_download(self.url,self.folder_name,on_progress_callback=self.show_status_single,isaudio=self.isaudio.get()).download()
         else:
-            series_downloader.Series_vid_download(url,self.folder_name,on_progress_callback=self.show_status_list).download()        
+            series_downloader.Series_vid_download(self.url,self.folder_name,on_progress_callback=self.show_status_list,isaudio=self.isaudio.get()).download()        
 
     def create_task_info_frame(self):
         #when a thread start, create a frame to show its info
         self.oneiteminfo=tk.Frame(self.download_status_frame)
         self.oneiteminfo.pack(side=tk.BOTTOM)
-        self.urllabelinfo = tk.Label(self.oneiteminfo,text=url)
+        self.urllabelinfo = tk.Label(self.oneiteminfo,text=self.url)
         self.urllabelinfo.pack(side=tk.LEFT)
         self.downloadpercentage = tk.Label(self.oneiteminfo)
         self.downloadpercentage.pack(side=tk.RIGHT)        
@@ -139,16 +139,21 @@ class Application(tk.Frame):
         #function to get setting from setting.json
         s=open('setting.json','r')
         self.settings=json.loads(s.read())
+        if self.settings=={}:
+            self.settings={"choice": "single", "folder_name": "../Downloads", "isaudio": False}
         s.close()
         self.choice1 = tk.StringVar()
         self.choice1.set(self.settings['choice'])
+        self.isaudio = tk.BooleanVar()
+        self.isaudio.set(self.settings['isaudio'])
         self.folder_name=self.settings['folder_name']
 
     def savesetting(self):
         #function to store setting to setting.json
         self.settings={
             'choice': self.choice1.get(),
-            'folder_name': self.folder_name
+            'folder_name': self.folder_name,
+            'isaudio': self.isaudio.get(),
         }
         s=open('setting.json','w')
         s.write(json.dumps(self.settings))

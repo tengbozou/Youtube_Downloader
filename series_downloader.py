@@ -3,11 +3,15 @@ from pytube import Playlist
 import os
 
 class Series_vid_download:
-	def __init__(self, baseurl,downloadfolder="../Downloads/",on_progress_callback=None):
+	def __init__(self, baseurl,downloadfolder="../Downloads/",on_progress_callback=None,isaudio=False):
 		self.baseurl=baseurl
-		self.playlist = Playlist(self.baseurl,on_progress_callback=on_progress_callback)
-		self.title = format_filename(self.playlist.title())
+		self.playlist = Playlist(self.baseurl,on_progress_callback=on_progress_callback,isaudio=isaudio)
+		if self.playlist.title():
+			self.title = format_filename(self.playlist.title())
+		else:
+			self.title = format_filename(self.baseurl)
 		self.downloadfolder=downloadfolder
+
 
 	def download(self):
 		folder = self.downloadfolder+self.title
@@ -27,4 +31,5 @@ def format_filename(s):
     return filename
 
 if __name__ == "__main__":
-	pass
+	a=Series_vid_download("https://www.youtube.com/watch?v=M8Uur3OyJD8&list=RDYqeW9_5kURI")
+	a.download()
