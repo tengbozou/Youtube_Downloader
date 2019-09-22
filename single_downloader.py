@@ -14,7 +14,7 @@ class Single_vid_download():
 		if self.isaudio:
 			youtube.streams.filter(only_audio=self.isaudio).first().download(self.downloadfolder)
 		else:
-			youtube.streams.filter(progressive=True, subtype='mp4').order_by("resolution").desc().first().download(self.downloadfolder)
+			youtube.streams.first().download(self.downloadfolder)
 
 if __name__ == "__main__":
 	pass
