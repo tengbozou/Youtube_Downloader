@@ -3,7 +3,7 @@ from pytube import Playlist
 import os
 
 class Series_vid_download:
-	def __init__(self, baseurl,downloadfolder="../Downloads/",on_progress_callback=None,on_complete_callback=None,isaudio=False):
+	def __init__(self, baseurl,downloadfolder="../Downloads",on_progress_callback=None,on_complete_callback=None,isaudio=False):
 		self.baseurl=baseurl
 		self.playlist = Playlist(self.baseurl,on_progress_callback=on_progress_callback,on_complete_callback=on_complete_callback,isaudio=isaudio)
 		if self.playlist.title():
@@ -14,7 +14,7 @@ class Series_vid_download:
 
 
 	def download(self):
-		folder = self.downloadfolder+self.title
+		folder = os.path.join(self.downloadfolder,self.title)
 		if not os.path.exists(folder):
 			os.mkdir(folder)
 		

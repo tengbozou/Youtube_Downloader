@@ -149,7 +149,6 @@ class Playlist(object):
         logger.debug('total videos found: %d', len(self.video_urls))
         logger.debug('starting download')
         prefix_gen = self._path_num_prefix_generator(reverse_numbering)
-        print(self.video_urls)
         for link in self.video_urls:
             try:
                 yt = YouTube(link)
@@ -161,7 +160,7 @@ class Playlist(object):
                 # TODO: this should not be hardcoded to a single user's
                 # preference
                 dl_stream = yt.streams.filter(
-                    progressive=True, subtype='mp4', audio_only=self.isaudio
+                    progressive=True, subtype='mp4', only_audio=self.isaudio
                 ).order_by('resolution').desc().first()
 
                 logger.debug('download path: %s', download_path)
@@ -172,7 +171,7 @@ class Playlist(object):
                 else:
                     dl_stream.download(download_path)
                 logger.debug('download complete')
-                self.on_complete_callback()
+        self.on_complete_callback()
 
 
     def title(self):
