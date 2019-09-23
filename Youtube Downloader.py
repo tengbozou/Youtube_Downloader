@@ -131,8 +131,8 @@ class Application(tk.Frame):
         self.downloadpercentage['text']="completed"
         self.downloadpercentage['fg']="green"
 
-    def on_complete_list(self):
-        self.downloadpercentage['text']="completed"
+    def on_complete_list(self,failed,total):
+        self.downloadpercentage['text']="completed {0}/{1}, failed {2}".format(total-failed,total,failed)
         self.downloadpercentage['fg']="green"
     
 

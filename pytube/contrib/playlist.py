@@ -149,6 +149,7 @@ class Playlist(object):
         logger.debug('total videos found: %d', len(self.video_urls))
         logger.debug('starting download')
         prefix_gen = self._path_num_prefix_generator(reverse_numbering)
+        failed = 0
         for link in self.video_urls:
             try:
                 yt = YouTube(link)
@@ -156,6 +157,7 @@ class Playlist(object):
                 self.on_progress_callback(progress_message)
             except Exception as e:
                 progress_message = str(e)
+                failed += 1
             else:
                 # TODO: this should not be hardcoded to a single user's
                 # preference
@@ -171,7 +173,7 @@ class Playlist(object):
                 else:
                     dl_stream.download(download_path)
                 logger.debug('download complete')
-        self.on_complete_callback()
+        self.on_complete_callback(failed,len(self.video_urls))
 
 
     def title(self):
