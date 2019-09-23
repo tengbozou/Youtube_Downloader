@@ -90,28 +90,53 @@ class Application(tk.Frame):
         #whenever press the download button, a thread is created
         self.url = self.input.get()
         self.create_task_info_frame()
-        if self.choice1.get() == "single":
-            single_downloader.Single_vid_download(self.url,self.folder_name,on_progress_callback=self.show_status_single,isaudio=self.isaudio.get()).download()
-        else:
-            series_downloader.Series_vid_download(self.url,self.folder_name,on_progress_callback=self.show_status_list,isaudio=self.isaudio.get()).download()        
+        try:
+            if self.choice1.get() == "single":
+                single_downloader.Single_vid_download(self.url,self.folder_name,
+                    on_progress_callback=self.on_progress_single,
+                    on_complete_callback=self.on_complete_single,
+                    isaudio=self.isaudio.get()).download()
+            else:
+                series_downloader.Series_vid_download(self.url,self.folder_name,
+                    on_progress_callback=self.on_progress_list,
+                    on_complete_callback=self.on_complete_list,
+                    isaudio=self.isaudio.get()).download()        
+        except Exception as e:
+            self.downloadpercentage['text']="failed: " + str(e)
+            self.downloadpercentage['fg']="red"
+            raise
 
     def create_task_info_frame(self):
         #when a thread start, create a frame to show its info
         self.oneiteminfo=tk.Frame(self.download_status_frame)
         self.oneiteminfo.pack(side=tk.BOTTOM)
+        self.file_title = tk.Label(self.oneiteminfo, text="")
+        self.file_title.pack(side=tk.LEFT,padx=10)
         self.urllabelinfo = tk.Label(self.oneiteminfo,text=self.url)
-        self.urllabelinfo.pack(side=tk.LEFT)
-        self.downloadpercentage = tk.Label(self.oneiteminfo)
-        self.downloadpercentage.pack(side=tk.RIGHT)        
+        self.urllabelinfo.pack(side=tk.LEFT,padx=10)
+
+        self.downloadpercentage = tk.Label(self.oneiteminfo,text="downloading",fg="blue")
+        self.downloadpercentage.pack(side=tk.RIGHT,padx=10)        
 
 #when a downloading task/thread is created, change the info of downloading status\
 #by the following two functions, one for single, one for list
-    def show_status_single(self, stream, chunk, file_handler, bytes_remaining): 
-        
-        self.downloadpercentage['text']="{:.1f}%".format((100*(stream._filesize-bytes_remaining))/stream._filesize)
+    def on_progress_single(self, stream, chunk, file_handler, bytes_remaining): 
+        self.file_title["text"]=stream.player_config_args['title']
+        self.downloadpercentage['text']="downloading {:.1f}%".format((100*(stream._filesize-bytes_remaining))/stream._filesize)
 
-    def show_status_list(self,progress_message):
+    def on_progress_list(self,progress_message):
         self.downloadpercentage['text']=progress_message
+
+    def on_complete_single(self,stream,file_handle):
+        self.downloadpercentage['text']="completed"
+        self.downloadpercentage['fg']="green"
+
+    def on_complete_list(self):
+        self.downloadpercentage['text']="completed"
+        self.downloadpercentage['fg']="green"
+    
+
+
 
     def download(self):
         # button download's callback function

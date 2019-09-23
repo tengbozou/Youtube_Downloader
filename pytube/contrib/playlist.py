@@ -18,11 +18,12 @@ class Playlist(object):
     playlist
     """
 
-    def __init__(self, url, suppress_exception=False,on_progress_callback=None,isaudio=False):
+    def __init__(self, url, suppress_exception=False,on_progress_callback=None,on_complete_callback=None,isaudio=False):
         self.playlist_url = url
         self.video_urls = []
         self.suppress_exception = suppress_exception
         self.on_progress_callback = on_progress_callback
+        self.on_complete_callback = on_complete_callback
         self.isaudio=isaudio
 
     def construct_playlist_url(self):
@@ -152,11 +153,10 @@ class Playlist(object):
         for link in self.video_urls:
             try:
                 yt = YouTube(link)
-                progress_message = "{}/{}".format(self.video_urls.index(link)+1,len(self.video_urls))
-                print(link,progress_message)
+                progress_message = "downloading {}/{}".format(self.video_urls.index(link)+1,len(self.video_urls))
                 self.on_progress_callback(progress_message)
             except Exception as e:
-                print(e)
+                progress_message = str(e)
             else:
                 # TODO: this should not be hardcoded to a single user's
                 # preference
@@ -172,6 +172,8 @@ class Playlist(object):
                 else:
                     dl_stream.download(download_path)
                 logger.debug('download complete')
+                self.on_complete_callback()
+
 
     def title(self):
         """return playlist title (name)

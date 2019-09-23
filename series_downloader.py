@@ -3,9 +3,9 @@ from pytube import Playlist
 import os
 
 class Series_vid_download:
-	def __init__(self, baseurl,downloadfolder="../Downloads/",on_progress_callback=None,isaudio=False):
+	def __init__(self, baseurl,downloadfolder="../Downloads/",on_progress_callback=None,on_complete_callback=None,isaudio=False):
 		self.baseurl=baseurl
-		self.playlist = Playlist(self.baseurl,on_progress_callback=on_progress_callback,isaudio=isaudio)
+		self.playlist = Playlist(self.baseurl,on_progress_callback=on_progress_callback,on_complete_callback=on_complete_callback,isaudio=isaudio)
 		if self.playlist.title():
 			self.title = format_filename(self.playlist.title())
 		else:
