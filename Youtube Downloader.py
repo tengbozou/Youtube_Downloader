@@ -162,11 +162,15 @@ class Application(tk.Frame):
 
     def setting(self):
         #function to get setting from setting.json
-        s=open('setting.json','r')
-        self.settings=json.loads(s.read())
+        try:
+            s=open('setting.json','r')
+            self.settings=json.loads(s.read())
+            s.close()
+        except:
+            self.settings={"choice": "single", "folder_name": "Downloads", "isaudio": False}
         if self.settings=={}:
-            self.settings={"choice": "single", "folder_name": "../Downloads", "isaudio": False}
-        s.close()
+            self.settings={"choice": "single", "folder_name": "Downloads", "isaudio": False}
+            
         self.choice1 = tk.StringVar()
         self.choice1.set(self.settings['choice'])
         self.isaudio = tk.BooleanVar()
