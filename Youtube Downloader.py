@@ -63,6 +63,9 @@ class Application(tk.Frame):
         
         self.audioonly = tk.Checkbutton(self.selection_frame,text="Audio Only",variable=self.isaudio)
         self.audioonly.pack(side=tk.RIGHT,padx=30)
+        
+        self.caption = tk.Checkbutton(self.selection_frame,text="Caption",variable=self.withcaption)
+        self.caption.pack(side=tk.RIGHT,padx=30)
 
     def downloadfolder_frame(self):
         #download_path
@@ -95,7 +98,7 @@ class Application(tk.Frame):
                 single_downloader.Single_vid_download(self.url,self.folder_name,
                     on_progress_callback=self.on_progress_single,
                     on_complete_callback=self.on_complete_single,
-                    isaudio=self.isaudio.get()).download()
+                    isaudio=self.isaudio.get()).download(withcaption=self.withcaption.get())
             else:
                 series_downloader.Series_vid_download(self.url,self.folder_name,
                     on_progress_callback=self.on_progress_list,
@@ -167,15 +170,17 @@ class Application(tk.Frame):
             self.settings=json.loads(s.read())
             s.close()
         except:
-            self.settings={"choice": "single", "folder_name": "Downloads", "isaudio": False}
+            self.settings={"choice": "single", "folder_name": "Downloads", "isaudio": False, 'withcaption': False}
         if self.settings=={}:
-            self.settings={"choice": "single", "folder_name": "Downloads", "isaudio": False}
+            self.settings={"choice": "single", "folder_name": "Downloads", "isaudio": False, 'withcaption': False}
             
         self.choice1 = tk.StringVar()
         self.choice1.set(self.settings['choice'])
         self.isaudio = tk.BooleanVar()
         self.isaudio.set(self.settings['isaudio'])
         self.folder_name=self.settings['folder_name']
+        self.withcaption = tk.BooleanVar()
+        self.withcaption.set(self.settings['withcaption'])
 
     def savesetting(self):
         #function to store setting to setting.json
@@ -183,6 +188,7 @@ class Application(tk.Frame):
             'choice': self.choice1.get(),
             'folder_name': self.folder_name,
             'isaudio': self.isaudio.get(),
+            'withcaption': self.withcaption.get()
         }
         s=open('setting.json','w')
         s.write(json.dumps(self.settings))
