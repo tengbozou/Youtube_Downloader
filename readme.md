@@ -3,6 +3,8 @@ This is an opensource app for downloading youtube videos/musics. It is usable bu
 
 ![Imgur](https://i.imgur.com/cnf8BL4.png)
 
+## requirements
+python3
 
 ## including files:
 1. single_downlader.py: module for downloading single video/music
